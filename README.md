@@ -68,3 +68,12 @@ and assemble these cubes would be good.
 ![Blue illuminated cube](images/cube.jpg)
 ![Lit cube next to a cube with the back shown](images/cube_back.jpg)
 ![Various parts of the cube next to each other](images/boards.jpg)
+![Layout of the PCB](images/pcb.jpg)
+
+## A note on the completion of this project
+Largely, what needs to be done is all documentation - part lists, schematics, as
+well as general assembly instructions. My KiCad project in which I created
+schematics and PCBs appears to have been corrupted, so aside from the image
+above and gerber files I sent off to fabrication I'll need to work on recreating
+them. This will likely become a summer project for me in between semester, as I
+work to improve this project.
