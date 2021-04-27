@@ -51,12 +51,12 @@ boolean checkUblox() {
     }
 
     //Limit to 32 bytes or whatever the buffer limit is for given platform
-    uint16_t bytesToRead = bytesAvailable;
+    size_t bytesToRead = bytesAvailable;
     if (bytesToRead > 32) {
       bytesToRead = 32;
     }
 
-    Wire.requestFrom(UBX_ADDR, bytesToRead);
+    Wire.requestFrom((uint8_t) UBX_ADDR, bytesToRead);
     if (Wire.available()) {
       for (uint16_t x = 0; x < bytesToRead; x++) {
         byte incoming = Wire.read();

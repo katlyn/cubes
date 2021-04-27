@@ -10,6 +10,10 @@ void initLeds() {
   strip.begin();
   strip.clear();
   strip.show();
+  for (byte i = 0; i < LED_COUNT; i++) {
+    state[i].color = 0xFFFFFF;
+    state[i].mode = LED_RAINBOW;
+  }
 }
 
 void updateLeds () {
@@ -50,7 +54,7 @@ void autoBrightness () {
   // Map numbers to play nicely
   reading = constrain(reading, 0, 500);
   int brightness = map(reading, 0, 500, 10, 254);
-  strip.setBrightness(brightness);
+  strip.setBrightness(254);
 }
 
 // Paints solid as well as blinking LEDs
@@ -137,8 +141,8 @@ void rainbowCycle() {
   static unsigned long lastUpdate = 0;
 
   unsigned long elapsedDuration = millis() - lastUpdate;
-  if (elapsedDuration > 20) {
-    iteration += elapsedDuration / 20;
+  if (elapsedDuration > 40) {
+    iteration += elapsedDuration / 40;
     lastUpdate = millis();
   }
   for(uint16_t i = 0; i < LED_COUNT; i++) {
