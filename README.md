@@ -1,157 +1,70 @@
 # Cubed
 Modular LED cubes that can be controlled via serial port or be allowed to idly
-cycle through colors.
+cycle through colors. This source code includes a very simple GUI client in the
+`controller` directory.
 
-## Requirements
-- [ ] Base
-  - [x] Write serial protocol documentation
-  - [x] Finalize hardware layout
-    - [x] Enclosure
-    - [x] Number of LEDs per cube
-      - There will only be one LED per cube due to hardware resource
-      constraints.
-    - Connector style (just female headers)
-  - [x] Decide ambient functionality
-    - Time based (GPS being used)
-    - Blink
-    - Solid color
-    - Rainbow
-    - Disabled
-  - [ ] Firmware development
-    - [ ] Communication protocol
-    - [ ] Color smoothing
-    - [ ] Ambient modes
+## Documentation
+The serial communication protocol can be found in [`docs/protocol.md`](docs/protocol.md)
 
-- [ ] Stretch
-  - [ ] Manufacture PCBs
-  - [ ] Capacitive touch
-  - [ ] Desktop side program to control based on events
-    - [ ] Discord notifications (game-sdk)
-    - [ ] Weather
-    - [ ] Other?
+## Features
+- Simple serial protocol
+- Optional GPS support for time-based color changing
+- looks pretty neat i think
 
-## Protocol v0
-The protocol used for communication is fairly simple. All commands must begin
-with a one byte opcode, followed by arguments. All arguments **must** be
-provided for any given opcode, and no extraneous arguments can be provided.
-These restrictions apply to both transmitted and received communications.
+## Motivation
+The largest motivator behind this is that I've been wanting to create an easily
+controllable LED system that I'd be able to use anywhere. Primarily, I wanted
+for whatever I created to have a clean design, be easy to control, and as a
+bonus, integrate with platforms that I use often (the only one I ended up
+getting around to being Discord).
 
-Arguments to opcodes are typically byte-long pieces of information. Each opcode
-will provide information on their contents and format. The return of each
-each command is the original opcode followed by any return packets.
+The finished product ended up being (in my opinion) really impressive, and I
+learned a lot more skills over the course of creating it than I expected to. PCB
+design was a stretch goal that I had that I wasn't sure about at the start of
+the project, but in the end I am really proud of the polished and professional
+look that it gives the completed cubes.
 
+## Lessons Learned
+Feature creep is something that I continuously ran into throughout the course of
+the project - different features such as wireless communication, network
+connectivity, or fancy GUIs got me sidetracked several times, but I was able to
+keep scope down to a manageable level.
 
-### `0xBE` - BEGIN
-Begins serial communications and/or requests information on the connected
-device. This is a bidirectional opcode.
+The prime struggle I ran into on the firmware side was dealing with Arduino's
+storage constraints. Sparkfun's [µ-blox library](https://github.com/sparkfun/SparkFun_u-blox_GNSS_Arduino_Library)
+(used to communicate with the GPS for date and time) took up over 70% of the
+Arduino's memory, and what remained was not enough for the neopixel and
+communication control logic.
 
-#### Transmission
-No arguments.
+I didn't run into issues on the hardware side until I had ordered and received
+the PCBs - I surprised myself by designing a functioning board first try, though
+the issues arose when I tried assembling the hardware. The tools I had at hand
+were older and not in the best shape, making it difficult to solder accurately.
+Notably, there were several times I accidentally soldered legs of my LEDs
+together due to their small size, which was made even more frustrating due to
+not having access to solder wick or a similar tool. This resulted in one board
+having a power to ground short that I didn't catch until I plugged in and
+powered up an Arduino on the board, quickly followed by the Arduino emitting
+the dreaded magic smoke. I was much more careful in checking my boards going
+forward.
 
-#### Receiving
-This opcode has three arguments. They consist of the protocol version, the
-number of cubes currently connected, and the global brightness setting. Below is
-an example of bytes that might be seen when receiving this opcode.
+## Where to go from here
+From here, I would like to polish the project a bit more, especially on the
+controller side. If my time and budget permits, I'd primarily like to focus on
+the style of communication between the controller and the cube system, as well
+as the means of connection between the individual cubes themselves. As of right
+now, a USB serial isn't ideal nor the fastest method of communication, and
+jumper cables between each cube isn't the most eye pleasing connection style,
+nor the most robust. Very far reaching goals would include looking into surface
+mount components rather than through hole for the PCB assembly (which would
+allow for a cleaner backface), and potentially wireless communication support
+which would make connectivity much easier.
 
-```
-opcode    ver       #cubes    brightness
-10111110  00000000  00000101  11111111
-0xBE      0x00      0x05      0xFF
-```
-
-
-### `0xCA` - UPDATE
-Updates the state of all cubes.
-
-#### Transmission
-No arguments.
-
-#### Receiving
-Returns original opcode, no additional data.
+Additionally, better documentation as well as instructions for how to fabricate
+and assemble these cubes would be good.
 
 
-### `0xCB` - SET MODE
-Set the mode of a cube. The following modes are supported.
-
-| `CODE` | Description |
-| ------ | ----------- |
-| `0x00` | Disabled, the cube will not be lit. |
-| `0x01` | Solid color, defaults to black but can be overridden by `SET COLOR` opcode. | 
-| `0x02` | Blink, cube will cycle between black and the color specified by `SET COLOR` every 500ms. |
-| `0x03` | Daylight, changes according to the current time of day. |
-| `0x04` | Rainbow, cycles through RGB values in a rainbow. |
-
-#### Transmission
-Two arguments, the cube and the specified mode.
-
-```
-opcode    cube      mode
-11001011  00000010  00000011
-0xCB      0x02      0x03
-```
-
-#### Receiving
-Returns original opcode, no additional data.
-
-
-### `0xCC` - GET MODE
-Used to get the mode of the specified cube.
-
-#### Transmitting
-One argument, the cube that you'd like to get the mode of.
-
-```
-opcode    cube
-11001101  00000010
-0xCC      0x02
-```
-
-#### Receiving
-Two arguments, the number and the mode of the cube that you requested.
-
-```
-opcode    cube      mode
-11001011  00000010  00000011
-0xCB      0x02      0x03
-```   0x03
-```
-
-
-### `0xCD` - SET COLOR
-Sets the specified cube to the specified color. Does not update the cube.
-
-#### Transmission
-Four arguments, specifing the cube and RBG value to set it to. The below example
-sets the second cube (zero indexed) to white.
-
-```
-opcode    cube      R         G         B
-11001101  00000010  11111111  11111111  11111111
-0xCD      0x02      0xFF      0xF       0xFF
-```
-
-#### Receiving
-Returns original opcode, no additional data.
-
-
-### `0xCE` - GET COLOR
-Used to get the mode of the specified cube.
-
-#### Transmitting
-One argument, the cube that you'd like to get the color of.
-
-```
-opcode    cube
-11001110  00000010
-0xCE      0x02
-```
-
-#### Receiving
-Four arguments, the number and the RGB color values of the cube that you
-requested.
-
-```
-opcode    cube      R         G         B
-11001110  00000010  11111111  11111111  11111111
-0xCE      0x02      0xFF      0xF       0xFF
-```
+## Images
+![Blue illuminated cube](images/cube.jpg)
+![Lit cube next to a cube with the back shown](images/cube_back.jpg)
+![Various parts of the cube next to each other](images/boards.jpg)
