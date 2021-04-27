@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Cube Controller</title>
+  <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
+  <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
+</head>
+
+<body>
+  <h1>Control</h1>
+  <div>
+    <input type="number" id="cube-num" name="cube-num" value="0" min="0">
+    <label for="cube-num">Cube</label>
+  </div>
+  <div>
+    <input type="color" id="color" name="color" value="#FFFFFF">
+    <label for="color">Color</label>
+  </div>
+  <div>
+    <select name="mode" id="mode">
+      <option value="0">Disabled</option>
+      <option value="1">Solid</option>
+      <option value="2">Blink</option>
+      <option value="3">Daylight</option>
+      <option value="4">Rainbow</option>
+    </select>
+    <label for="mode">Mode</label>
+  </div>
+
+  <button id="update">Update</button>
+  <button id="update-all">Update All</button>
+
+
+  <h1>General info</h1>
+  <p><span id="numCubes"></span> cubes. Firmware version <span id="version"></span>.</p>
+
+  <h1>Log</h1>
+  <div id="log"></div>
+
+  <!-- You can also require other files to run in this process -->
+  <script src="./dist/renderer.js"></script>
+</body>
+
+</html>
