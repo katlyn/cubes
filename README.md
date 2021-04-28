@@ -1,7 +1,10 @@
-# Cubed
+# Cubes
 Modular LED cubes that can be controlled via serial port or be allowed to idly
 cycle through colors. This source code includes a very simple GUI client in the
 `controller` directory.
+
+Crafted as a cumulative project for CS F241 at the University of Alaska
+Fairbanks.
 
 ## Documentation
 Documentation for the serial communication protocol can be found in
