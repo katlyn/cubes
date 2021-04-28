@@ -4,12 +4,57 @@ cycle through colors. This source code includes a very simple GUI client in the
 `controller` directory.
 
 ## Documentation
-The serial communication protocol can be found in [`docs/protocol.md`](docs/protocol.md)
+Documentation for the serial communication protocol can be found in
+[`docs/protocol.md`](docs/protocol.md). Other documentation, such as production
+and assembly, will be added as it is created.
 
 ## Features
 - Simple serial protocol
 - Optional GPS support for time-based color changing
 - looks pretty neat i think
+
+### The same, but in long form
+These cubes implement a simple protocol I created that allows each cube to be
+controlled individually. Currently up to 255 cubes can be chained together,
+though that can easily change with minor edits to the protocol. Each cube can be
+put into one of five modes, independent of the others:
+
+- Disabled. As the name implies, any cubes in this mode are turned off and do
+  not receive updates.
+- Solid. Any cube in this mode displays a solid color, and does not change.
+- Blink. Much like solid, any cube in this mode displays a solid color, in
+  addition to turning on and off every other second. Useful for bringing
+  attention to something.
+- Daylight. This mode uses the optional GPS to shift colors on the cube
+  relative to the sun's position. Solar noon will be white, sunset orange, solar
+  midnight blue, and sunrise green. If the GPS is not present or does not have a
+  fix, any cubes in this mode will be turned off. Currently this mode has some
+  issues where changes in color may quickly jump instead of the gradual change
+  that they should have.
+- Rainbow. This mode cycles cubes through the color wheel. Notably, the color
+  distribution of this mode is split evenly across all cubes in the system, so
+  with many cubes set to rainbow they will show a smooth gradient across the
+  rainbow.
+
+The Arduino refreshes cubes as quickly as it can, so any updates to the system
+will be reflected fairly quickly. The ability to perform complex control such
+as animations is currently limited primarily by the method of communication as
+well as the protocol. Namely, adding a bulk update command to the protocol would
+likely allow much smoother and faster updates to the system. In addition,
+allowing the use of a "command buffer" that holds updates until given the
+go-ahead could allow much more complex control.
+
+The current setup consists of one controller cube and a variable number of
+headless cubes that are chained together from the controller cube. The prime
+disadvantage to this setup is that the Arduino does not have a way to
+dynamically determine the number cubes connected to it, limiting the
+optimizations that are able to be made easily.
+
+Current, when started up all cubes are set to solid white - this can be changed
+in code, and the possibility of writing the current configuration to EEPROM has
+been considered, but not implemented. Connection to a controller is not
+required, though without it any fancier features (such as the above documented
+modes) will not be available without modification.
 
 ## Motivation
 The largest motivator behind this is that I've been wanting to create an easily
@@ -24,7 +69,7 @@ design was a stretch goal that I had that I wasn't sure about at the start of
 the project, but in the end I am really proud of the polished and professional
 look that it gives the completed cubes.
 
-## Lessons Learned
+## Lessons learned
 Feature creep is something that I continuously ran into throughout the course of
 the project - different features such as wireless communication, network
 connectivity, or fancy GUIs got me sidetracked several times, but I was able to
@@ -63,8 +108,7 @@ which would make connectivity much easier.
 Additionally, better documentation as well as instructions for how to fabricate
 and assemble these cubes would be good.
 
-
-## Images
+## Photos
 ![Blue illuminated cube](images/cube.jpg)
 ![Lit cube next to a cube with the back shown](images/cube_back.jpg)
 ![Various parts of the cube next to each other](images/boards.jpg)
