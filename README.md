@@ -109,7 +109,9 @@ allow for a cleaner backface), and potentially wireless communication support
 which would make connectivity much easier.
 
 Additionally, better documentation as well as instructions for how to fabricate
-and assemble these cubes would be good.
+and assemble these cubes would be beneficial. Creating a more finished and final
+product is something that I am interested in doing, and I may put additional
+work into this project over the future if time allows.
 
 ## Photos
 ![Blue illuminated cube](images/cube.jpg)
